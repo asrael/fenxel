@@ -6,12 +6,12 @@
 #include "script.c"
 
 typedef struct FXL_Host {
-    SDL_Window*     window;
-    SDL_Renderer*   renderer;
+    SDL_Window     *window;
+    SDL_Renderer   *renderer;
     FXL_Script      script;
 } FXL_Host;
 
-internal const char* app_result_name(SDL_AppResult result) {
+internal const char *app_result_name(SDL_AppResult result) {
     switch(result) {
         case SDL_APP_CONTINUE:  return "SDL_APP_CONTINUE";
         case SDL_APP_SUCCESS:   return "SDL_APP_SUCCESS";
@@ -21,17 +21,17 @@ internal const char* app_result_name(SDL_AppResult result) {
     return "unknown";
 }
 
-internal void clear(FXL_Host* host, uint32_t rgb) {
+internal void clear(FXL_Host *host, uint32_t rgb) {
     SDL_SetRenderDrawColor(host->renderer, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, 0xFF);
     SDL_RenderClear(host->renderer);
 }
 
-internal void present(FXL_Host* host) {
+internal void present(FXL_Host *host) {
     SDL_RenderPresent(host->renderer);
 }
 
-internal SDL_AppResult fail(const char* desc) {
-    const char* err = SDL_GetError();
+internal SDL_AppResult fail(const char *desc) {
+    const char *err = SDL_GetError();
 
     if (!err) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", desc);
@@ -42,12 +42,12 @@ internal SDL_AppResult fail(const char* desc) {
     return SDL_APP_FAILURE;
 }
 
-SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     (void)argc;
     (void)argv;
 
     static FXL_Host state;
-    FXL_Host* host = &state;
+    FXL_Host *host = &state;
     *appstate = host;
 
     if (!SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMEPAD | SDL_INIT_VIDEO)) return fail("SDL_Init");
@@ -60,12 +60,10 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 
     if (!script_init(&host->script)) return fail("script_init failed");
 
-    script_run(&host->script, "error('boom')", "=boom");
-
     return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
+SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     (void)appstate;
 
     switch(event->type) {
@@ -76,7 +74,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
     return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult SDL_AppIterate(void* appstate) {
+SDL_AppResult SDL_AppIterate(void *appstate) {
     FXL_Host* host = appstate;
 
     clear(host, 0x1D2021);
@@ -85,8 +83,8 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
     return SDL_APP_CONTINUE;
 }
 
-void SDL_AppQuit(void* appstate, SDL_AppResult result) {
-    FXL_Host* host = appstate;
+void SDL_AppQuit(void *appstate, SDL_AppResult result) {
+    FXL_Host *host = appstate;
 
     SDL_Log("quit result: %s", app_result_name(result));
 
